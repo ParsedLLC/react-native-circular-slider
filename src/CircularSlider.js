@@ -102,6 +102,24 @@ export default class CircularSlider extends PureComponent {
 
         onUpdate({ startAngle: newAngle, angleLength: newAngleLength % (2 * Math.PI) });
       },
+      onPanResponderRelease: (evt, { moveX, moveY }) => {
+        const { circleCenterX, circleCenterY } = this.state;
+        const { angleLength, startAngle, onRelease } = this.props;
+
+        const currentAngleStop = (startAngle + angleLength) % (2 * Math.PI);
+        let newAngle = Math.atan2(moveY - circleCenterY, moveX - circleCenterX) + Math.PI / 2;
+
+        if (newAngle < 0) {
+          newAngle += 2 * Math.PI;
+        }
+
+        let newAngleLength = currentAngleStop - newAngle;
+
+        if (newAngleLength < 0) {
+          newAngleLength += 2 * Math.PI;
+        }
+        onRelease({ startAngle, angleLength: newAngleLength % (2 * Math.PI) });
+      },
     });
 
     this._wakePanResponder = PanResponder.create({
@@ -111,7 +129,7 @@ export default class CircularSlider extends PureComponent {
 
       onPanResponderMove: (evt, { moveX, moveY }) => {
         const { circleCenterX, circleCenterY } = this.state;
-        const { angleLength, startAngle, onUpdate } = this.props;
+        const { startAngle, onUpdate } = this.props;
 
         let newAngle = Math.atan2(moveY - circleCenterY, moveX - circleCenterX) + Math.PI / 2;
         let newAngleLength = (newAngle - startAngle) % (2 * Math.PI);
@@ -119,8 +137,18 @@ export default class CircularSlider extends PureComponent {
         if (newAngleLength < 0) {
           newAngleLength += 2 * Math.PI;
         }
-
         onUpdate({ startAngle, angleLength: newAngleLength });
+      },
+      onPanResponderRelease: (evt, { moveX, moveY }) => {
+        const { startAngle, onRelease } = this.props;
+        const { circleCenterX, circleCenterY } = this.state;
+
+        let newAngle = Math.atan2(moveY - circleCenterY, moveX - circleCenterX) + Math.PI / 2;
+        let newAngleLength = (newAngle - startAngle) % (2 * Math.PI);
+        if (newAngleLength < 0) {
+          newAngleLength += 2 * Math.PI;
+        }
+        onRelease({ startAngle, angleLength: newAngleLength });
       },
     });
   }
