@@ -167,21 +167,30 @@ export default class CircularSlider extends PureComponent {
         if (newAngleLength < 0) {
           newAngleLength += 2 * Math.PI;
         }
-
-        let aNewAngle =
+        // So I don't really understand why, but
+        // we're adding the amount missing from the
+        // circle times how far we've progressed
+        // FOR EXAMPLE:
+        // If the circle is only 90% of a circle, then we need to add
+        // ten percent of a circle TIMES how much of the media we've played
+        let newAngleWithMissingProportionAdded =
           Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
           Math.PI / 2 +
           (1 - circlePercentInDecimal) *
             2 *
             Math.PI *
             (newAngleLength / (2 * Math.PI));
-        let aNewAngleLength = (aNewAngle - startAngle) % (2 * Math.PI);
+        let newAngleWithMissingProportionAddedLength =
+          (newAngleWithMissingProportionAdded - startAngle) % (2 * Math.PI);
 
-        if (aNewAngleLength < 0) {
-          aNewAngleLength += 2 * Math.PI;
+        if (newAngleWithMissingProportionAddedLength < 0) {
+          newAngleWithMissingProportionAddedLength += 2 * Math.PI;
         }
 
-        onUpdate({ startAngle, angleLength: aNewAngleLength });
+        onUpdate({
+          startAngle,
+          angleLength: newAngleWithMissingProportionAddedLength,
+        });
       },
       onPanResponderRelease: (evt, { moveX, moveY }) => {
         const { startAngle, onRelease, circlePercentInDecimal } = this.props;
@@ -194,21 +203,30 @@ export default class CircularSlider extends PureComponent {
         if (newAngleLength < 0) {
           newAngleLength += 2 * Math.PI;
         }
-
-        let aNewAngle =
+        // So I don't really understand why, but
+        // we're adding the amount missing from the
+        // circle times how far we've progressed
+        // FOR EXAMPLE:
+        // If the circle is only 90% of a circle, then we need to add
+        // ten percent of a circle TIMES how much of the media we've played
+        let newAngleWithMissingProportionAdded =
           Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
           Math.PI / 2 +
           (1 - circlePercentInDecimal) *
             2 *
             Math.PI *
             (newAngleLength / (2 * Math.PI));
-        let aNewAngleLength = (aNewAngle - startAngle) % (2 * Math.PI);
+        let newAngleWithMissingProportionAddedLength =
+          (newAngleWithMissingProportionAdded - startAngle) % (2 * Math.PI);
 
-        if (aNewAngleLength < 0) {
-          aNewAngleLength += 2 * Math.PI;
+        if (newAngleWithMissingProportionAddedLength < 0) {
+          newAngleWithMissingProportionAddedLength += 2 * Math.PI;
         }
 
-        onRelease({ startAngle, angleLength: aNewAngleLength });
+        onRelease({
+          startAngle,
+          angleLength: newAngleWithMissingProportionAddedLength,
+        });
       },
     });
   }
