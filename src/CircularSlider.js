@@ -1,12 +1,24 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { PanResponder, View } from 'react-native';
-import Svg, { Circle, G, LinearGradient, Path, Defs, Stop } from 'react-native-svg';
+import Svg, {
+  Circle,
+  G,
+  LinearGradient,
+  Path,
+  Defs,
+  Stop,
+} from 'react-native-svg';
 import range from 'lodash.range';
 import { interpolateHcl as interpolateGradient } from 'd3-interpolate';
 import ClockFace from './ClockFace';
 
-function calculateArcColor(index0, segments, gradientColorFrom, gradientColorTo) {
+function calculateArcColor(
+  index0,
+  segments,
+  gradientColorFrom,
+  gradientColorTo,
+) {
   const interpolate = interpolateGradient(gradientColorFrom, gradientColorTo);
 
   return {
@@ -15,7 +27,13 @@ function calculateArcColor(index0, segments, gradientColorFrom, gradientColorTo)
   };
 }
 
-function calculateArcCircle(index0, segments, radius, startAngle0 = 0, angleLength0 = 2 * Math.PI) {
+function calculateArcCircle(
+  index0,
+  segments,
+  radius,
+  startAngle0 = 0,
+  angleLength0 = 2 * Math.PI,
+) {
   // Add 0.0001 to the possible angle so when start = stop angle, whole circle is drawn
   const startAngle = startAngle0 % (2 * Math.PI);
   const angleLength = angleLength0 % (2 * Math.PI);
@@ -88,7 +106,9 @@ export default class CircularSlider extends PureComponent {
         const { angleLength, startAngle, onUpdate } = this.props;
 
         const currentAngleStop = (startAngle + angleLength) % (2 * Math.PI);
-        let newAngle = Math.atan2(moveY - circleCenterY, moveX - circleCenterX) + Math.PI / 2;
+        let newAngle =
+          Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
+          Math.PI / 2;
 
         if (newAngle < 0) {
           newAngle += 2 * Math.PI;
@@ -100,14 +120,19 @@ export default class CircularSlider extends PureComponent {
           newAngleLength += 2 * Math.PI;
         }
 
-        onUpdate({ startAngle: newAngle, angleLength: newAngleLength % (2 * Math.PI) });
+        onUpdate({
+          startAngle: newAngle,
+          angleLength: newAngleLength % (2 * Math.PI),
+        });
       },
       onPanResponderRelease: (evt, { moveX, moveY }) => {
         const { circleCenterX, circleCenterY } = this.state;
         const { angleLength, startAngle, onRelease } = this.props;
 
         const currentAngleStop = (startAngle + angleLength) % (2 * Math.PI);
-        let newAngle = Math.atan2(moveY - circleCenterY, moveX - circleCenterX) + Math.PI / 2;
+        let newAngle =
+          Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
+          Math.PI / 2;
 
         if (newAngle < 0) {
           newAngle += 2 * Math.PI;
@@ -131,24 +156,51 @@ export default class CircularSlider extends PureComponent {
         const { circleCenterX, circleCenterY } = this.state;
         const { startAngle, onUpdate } = this.props;
 
-        let newAngle = Math.atan2(moveY - circleCenterY, moveX - circleCenterX) + Math.PI / 2;
+        let newAngle =
+          Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
+          Math.PI / 2;
+
         let newAngleLength = (newAngle - startAngle) % (2 * Math.PI);
 
         if (newAngleLength < 0) {
           newAngleLength += 2 * Math.PI;
         }
-        onUpdate({ startAngle, angleLength: newAngleLength });
+
+        let aNewAngle =
+          Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
+          Math.PI / 2 +
+          0.1 * 2 * Math.PI * (newAngleLength / (2 * Math.PI));
+        let aNewAngleLength = (aNewAngle - startAngle) % (2 * Math.PI);
+
+        if (aNewAngleLength < 0) {
+          aNewAngleLength += 2 * Math.PI;
+        }
+
+        onUpdate({ startAngle, angleLength: aNewAngleLength });
       },
       onPanResponderRelease: (evt, { moveX, moveY }) => {
         const { startAngle, onRelease } = this.props;
         const { circleCenterX, circleCenterY } = this.state;
 
-        let newAngle = Math.atan2(moveY - circleCenterY, moveX - circleCenterX) + Math.PI / 2;
+        let newAngle =
+          Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
+          Math.PI / 2;
         let newAngleLength = (newAngle - startAngle) % (2 * Math.PI);
         if (newAngleLength < 0) {
           newAngleLength += 2 * Math.PI;
         }
-        onRelease({ startAngle, angleLength: newAngleLength });
+
+        let aNewAngle =
+          Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
+          Math.PI / 2 +
+          0.1 * 2 * Math.PI * (newAngleLength / (2 * Math.PI));
+        let aNewAngleLength = (aNewAngle - startAngle) % (2 * Math.PI);
+
+        if (aNewAngleLength < 0) {
+          aNewAngleLength += 2 * Math.PI;
+        }
+
+        onRelease({ startAngle, angleLength: aNewAngleLength });
       },
     });
   }
@@ -160,7 +212,10 @@ export default class CircularSlider extends PureComponent {
   setCircleCenter = () => {
     this._circle.measure((x, y, w, h, px, py) => {
       const halfOfContainer = this.getContainerWidth() / 2;
-      this.setState({ circleCenterX: px + halfOfContainer, circleCenterY: py + halfOfContainer });
+      this.setState({
+        circleCenterX: px + halfOfContainer,
+        circleCenterY: py + halfOfContainer,
+      });
     });
   };
 
@@ -188,8 +243,20 @@ export default class CircularSlider extends PureComponent {
 
     const containerWidth = this.getContainerWidth();
 
-    const start = calculateArcCircle(0, segments, radius, startAngle, angleLength);
-    const stop = calculateArcCircle(segments - 1, segments, radius, startAngle, angleLength);
+    const start = calculateArcCircle(
+      0,
+      segments,
+      radius,
+      startAngle,
+      angleLength,
+    );
+    const stop = calculateArcCircle(
+      segments - 1,
+      segments,
+      radius,
+      startAngle,
+      angleLength,
+    );
 
     return (
       <View
@@ -213,13 +280,13 @@ export default class CircularSlider extends PureComponent {
                 segments,
                 radius,
                 startAngle,
-                angleLength
+                angleLength,
               );
               const { fromColor, toColor } = calculateArcColor(
                 i,
                 segments,
                 gradientColorFrom,
-                gradientColorTo
+                gradientColorTo,
               );
               return (
                 <LinearGradient
@@ -241,25 +308,49 @@ export default class CircularSlider extends PureComponent {
         ##### Circle
       */}
 
-          <G x={`${strokeWidth / 2 + radius + 4}`} y={`${strokeWidth / 2 + radius + 4}`}>
-            <Circle
-              r={radius}
-              strokeWidth={strokeWidth}
-              fill="transparent"
-              stroke={bgCircleColor}
-            />
-            {showClockFace && <ClockFace r={radius - strokeWidth / 2} stroke={clockFaceColor} />}
+          <G
+            x={`${strokeWidth / 2 + radius + 4}`}
+            y={`${strokeWidth / 2 + radius + 4}`}
+          >
+            {range(segments).map(i => {
+              const { fromX, fromY, toX, toY } = calculateArcCircle(
+                i,
+                segments,
+                radius,
+                2 * Math.PI * 0.55,
+                2 * Math.PI * 0.9,
+              );
+              const d = `M ${fromX.toFixed(2)} ${fromY.toFixed(
+                2,
+              )} A ${radius} ${radius} 0 0 1 ${toX.toFixed(2)} ${toY.toFixed(
+                2,
+              )}`;
+              return (
+                <Path
+                  d={d}
+                  key={i}
+                  strokeWidth={strokeWidth}
+                  stroke={bgCircleColor}
+                  fill="none"
+                />
+              );
+            })}
+            {showClockFace && (
+              <ClockFace r={radius - strokeWidth / 2} stroke={clockFaceColor} />
+            )}
             {range(segments).map(i => {
               const { fromX, fromY, toX, toY } = calculateArcCircle(
                 i,
                 segments,
                 radius,
                 startAngle,
-                angleLength
+                angleLength,
               );
               const d = `M ${fromX.toFixed(2)} ${fromY.toFixed(
-                2
-              )} A ${radius} ${radius} 0 0 1 ${toX.toFixed(2)} ${toY.toFixed(2)}`;
+                2,
+              )} A ${radius} ${radius} 0 0 1 ${toX.toFixed(2)} ${toY.toFixed(
+                2,
+              )}`;
 
               return (
                 <Path
@@ -281,7 +372,9 @@ export default class CircularSlider extends PureComponent {
               y={`${stop.toY}`}
               fill={gradientColorTo}
               transform={{ translate: `${stop.toX}, ${stop.toY}` }}
-              onPressIn={() => this.setState({ angleLength: angleLength + Math.PI / 2 })}
+              onPressIn={() =>
+                this.setState({ angleLength: angleLength + Math.PI / 2 })
+              }
               {...this._wakePanResponder.panHandlers}
             >
               <Circle
