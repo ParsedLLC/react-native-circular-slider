@@ -65,6 +65,7 @@ function getGradientId(index) {
 
 export default class CircularSlider extends PureComponent {
   static propTypes = {
+    circlePercentInDecimal: PropTypes.number,
     onUpdate: PropTypes.func.isRequired,
     startAngle: PropTypes.number.isRequired,
     angleLength: PropTypes.number.isRequired,
@@ -154,7 +155,7 @@ export default class CircularSlider extends PureComponent {
 
       onPanResponderMove: (evt, { moveX, moveY }) => {
         const { circleCenterX, circleCenterY } = this.state;
-        const { startAngle, onUpdate } = this.props;
+        const { startAngle, onUpdate, circlePercentInDecimal } = this.props;
 
         let newAngle =
           Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
@@ -169,7 +170,10 @@ export default class CircularSlider extends PureComponent {
         let aNewAngle =
           Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
           Math.PI / 2 +
-          0.1 * 2 * Math.PI * (newAngleLength / (2 * Math.PI));
+          (1 - circlePercentInDecimal) *
+            2 *
+            Math.PI *
+            (newAngleLength / (2 * Math.PI));
         let aNewAngleLength = (aNewAngle - startAngle) % (2 * Math.PI);
 
         if (aNewAngleLength < 0) {
@@ -179,7 +183,7 @@ export default class CircularSlider extends PureComponent {
         onUpdate({ startAngle, angleLength: aNewAngleLength });
       },
       onPanResponderRelease: (evt, { moveX, moveY }) => {
-        const { startAngle, onRelease } = this.props;
+        const { startAngle, onRelease, circlePercentInDecimal } = this.props;
         const { circleCenterX, circleCenterY } = this.state;
 
         let newAngle =
@@ -193,7 +197,10 @@ export default class CircularSlider extends PureComponent {
         let aNewAngle =
           Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
           Math.PI / 2 +
-          0.1 * 2 * Math.PI * (newAngleLength / (2 * Math.PI));
+          (1 - circlePercentInDecimal) *
+            2 *
+            Math.PI *
+            (newAngleLength / (2 * Math.PI));
         let aNewAngleLength = (aNewAngle - startAngle) % (2 * Math.PI);
 
         if (aNewAngleLength < 0) {
@@ -239,6 +246,7 @@ export default class CircularSlider extends PureComponent {
       clockFaceColor,
       startIcon,
       stopIcon,
+      circlePercentInDecimal,
     } = this.props;
 
     const containerWidth = this.getContainerWidth();
@@ -312,29 +320,38 @@ export default class CircularSlider extends PureComponent {
             x={`${strokeWidth / 2 + radius + 4}`}
             y={`${strokeWidth / 2 + radius + 4}`}
           >
-            {range(segments).map(i => {
-              const { fromX, fromY, toX, toY } = calculateArcCircle(
-                i,
-                segments,
-                radius,
-                2 * Math.PI * 0.55,
-                2 * Math.PI * 0.9,
-              );
-              const d = `M ${fromX.toFixed(2)} ${fromY.toFixed(
-                2,
-              )} A ${radius} ${radius} 0 0 1 ${toX.toFixed(2)} ${toY.toFixed(
-                2,
-              )}`;
-              return (
-                <Path
-                  d={d}
-                  key={i}
-                  strokeWidth={strokeWidth}
-                  stroke={bgCircleColor}
-                  fill="none"
-                />
-              );
-            })}
+            {circlePercentInDecimal ? (
+              range(segments).map(i => {
+                const { fromX, fromY, toX, toY } = calculateArcCircle(
+                  i,
+                  segments,
+                  radius,
+                  2 * Math.PI * (1 - circlePercentInDecimal / 2),
+                  2 * Math.PI * circlePercentInDecimal,
+                );
+                const d = `M ${fromX.toFixed(2)} ${fromY.toFixed(
+                  2,
+                )} A ${radius} ${radius} 0 0 1 ${toX.toFixed(2)} ${toY.toFixed(
+                  2,
+                )}`;
+                return (
+                  <Path
+                    d={d}
+                    key={i}
+                    strokeWidth={strokeWidth}
+                    stroke={bgCircleColor}
+                    fill="none"
+                  />
+                );
+              })
+            ) : (
+              <Circle
+                r={radius}
+                strokeWidth={strokeWidth}
+                fill="transparent"
+                stroke={bgCircleColor}
+              />
+            )}
             {showClockFace && (
               <ClockFace r={radius - strokeWidth / 2} stroke={clockFaceColor} />
             )}
