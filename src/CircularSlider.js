@@ -1,24 +1,12 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { PanResponder, View } from 'react-native';
-import Svg, {
-  Circle,
-  G,
-  LinearGradient,
-  Path,
-  Defs,
-  Stop,
-} from 'react-native-svg';
+import Svg, { Circle, G, Line, LinearGradient, Path, Defs, Stop } from 'react-native-svg';
 import range from 'lodash.range';
 import { interpolateHcl as interpolateGradient } from 'd3-interpolate';
 import ClockFace from './ClockFace';
 
-function calculateArcColor(
-  index0,
-  segments,
-  gradientColorFrom,
-  gradientColorTo,
-) {
+function calculateArcColor(index0, segments, gradientColorFrom, gradientColorTo) {
   const interpolate = interpolateGradient(gradientColorFrom, gradientColorTo);
 
   return {
@@ -27,13 +15,7 @@ function calculateArcColor(
   };
 }
 
-function calculateArcCircle(
-  index0,
-  segments,
-  radius,
-  startAngle0 = 0,
-  angleLength0 = 2 * Math.PI,
-) {
+function calculateArcCircle(index0, segments, radius, startAngle0 = 0, angleLength0 = 2 * Math.PI) {
   // Add 0.0001 to the possible angle so when start = stop angle, whole circle is drawn
   const startAngle = startAngle0 % (2 * Math.PI);
   const angleLength = angleLength0 % (2 * Math.PI);
@@ -107,9 +89,7 @@ export default class CircularSlider extends PureComponent {
         const { angleLength, startAngle, onUpdate } = this.props;
 
         const currentAngleStop = (startAngle + angleLength) % (2 * Math.PI);
-        let newAngle =
-          Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
-          Math.PI / 2;
+        let newAngle = Math.atan2(moveY - circleCenterY, moveX - circleCenterX) + Math.PI / 2;
 
         if (newAngle < 0) {
           newAngle += 2 * Math.PI;
@@ -131,9 +111,7 @@ export default class CircularSlider extends PureComponent {
         const { angleLength, startAngle, onRelease } = this.props;
 
         const currentAngleStop = (startAngle + angleLength) % (2 * Math.PI);
-        let newAngle =
-          Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
-          Math.PI / 2;
+        let newAngle = Math.atan2(moveY - circleCenterY, moveX - circleCenterX) + Math.PI / 2;
 
         if (newAngle < 0) {
           newAngle += 2 * Math.PI;
@@ -157,9 +135,7 @@ export default class CircularSlider extends PureComponent {
         const { circleCenterX, circleCenterY } = this.state;
         const { startAngle, onUpdate, circlePercentInDecimal } = this.props;
 
-        let newAngle =
-          Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
-          Math.PI / 2;
+        let newAngle = Math.atan2(moveY - circleCenterY, moveX - circleCenterX) + Math.PI / 2;
 
         let newAngleLength = (newAngle - startAngle) % (2 * Math.PI);
 
@@ -170,10 +146,7 @@ export default class CircularSlider extends PureComponent {
         let aNewAngle =
           Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
           Math.PI / 2 +
-          (1 - circlePercentInDecimal) *
-            2 *
-            Math.PI *
-            (newAngleLength / (2 * Math.PI));
+          (1 - circlePercentInDecimal) * 2 * Math.PI * (newAngleLength / (2 * Math.PI));
         let aNewAngleLength = (aNewAngle - startAngle) % (2 * Math.PI);
 
         if (aNewAngleLength < 0) {
@@ -186,9 +159,7 @@ export default class CircularSlider extends PureComponent {
         const { startAngle, onRelease, circlePercentInDecimal } = this.props;
         const { circleCenterX, circleCenterY } = this.state;
 
-        let newAngle =
-          Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
-          Math.PI / 2;
+        let newAngle = Math.atan2(moveY - circleCenterY, moveX - circleCenterX) + Math.PI / 2;
         let newAngleLength = (newAngle - startAngle) % (2 * Math.PI);
         if (newAngleLength < 0) {
           newAngleLength += 2 * Math.PI;
@@ -197,10 +168,7 @@ export default class CircularSlider extends PureComponent {
         let aNewAngle =
           Math.atan2(moveY - circleCenterY, moveX - circleCenterX) +
           Math.PI / 2 +
-          (1 - circlePercentInDecimal) *
-            2 *
-            Math.PI *
-            (newAngleLength / (2 * Math.PI));
+          (1 - circlePercentInDecimal) * 2 * Math.PI * (newAngleLength / (2 * Math.PI));
         let aNewAngleLength = (aNewAngle - startAngle) % (2 * Math.PI);
 
         if (aNewAngleLength < 0) {
@@ -251,20 +219,8 @@ export default class CircularSlider extends PureComponent {
 
     const containerWidth = this.getContainerWidth();
 
-    const start = calculateArcCircle(
-      0,
-      segments,
-      radius,
-      startAngle,
-      angleLength,
-    );
-    const stop = calculateArcCircle(
-      segments - 1,
-      segments,
-      radius,
-      startAngle,
-      angleLength,
-    );
+    const start = calculateArcCircle(0, segments, radius, startAngle, angleLength);
+    const stop = calculateArcCircle(segments - 1, segments, radius, startAngle, angleLength);
 
     return (
       <View
@@ -288,13 +244,13 @@ export default class CircularSlider extends PureComponent {
                 segments,
                 radius,
                 startAngle,
-                angleLength,
+                angleLength
               );
               const { fromColor, toColor } = calculateArcColor(
                 i,
                 segments,
                 gradientColorFrom,
-                gradientColorTo,
+                gradientColorTo
               );
               return (
                 <LinearGradient
@@ -315,11 +271,15 @@ export default class CircularSlider extends PureComponent {
           {/*
         ##### Circle
       */}
-
-          <G
-            x={`${strokeWidth / 2 + radius + 4}`}
-            y={`${strokeWidth / 2 + radius + 4}`}
-          >
+          {/* <Line
+            x1={`${stop.fromX}`}
+            y1={`${stop.fromY}`}
+            x2={`${stop.fromX}`}
+            y2={`${stop.toY}`}
+            stroke="white"
+            strokeWidth="2"
+          /> */}
+          <G x={`${strokeWidth / 2 + radius + 4}`} y={`${strokeWidth / 2 + radius + 4}`}>
             {circlePercentInDecimal ? (
               range(segments).map(i => {
                 const { fromX, fromY, toX, toY } = calculateArcCircle(
@@ -327,21 +287,41 @@ export default class CircularSlider extends PureComponent {
                   segments,
                   radius,
                   2 * Math.PI * (1 - circlePercentInDecimal / 2),
-                  2 * Math.PI * circlePercentInDecimal,
+                  2 * Math.PI * circlePercentInDecimal
                 );
                 const d = `M ${fromX.toFixed(2)} ${fromY.toFixed(
-                  2,
-                )} A ${radius} ${radius} 0 0 1 ${toX.toFixed(2)} ${toY.toFixed(
-                  2,
-                )}`;
+                  2
+                )} A ${radius} ${radius} 0 0 1 ${toX.toFixed(2)} ${toY.toFixed(2)}`;
                 return (
-                  <Path
-                    d={d}
-                    key={i}
-                    strokeWidth={strokeWidth}
-                    stroke={bgCircleColor}
-                    fill="none"
-                  />
+                  <G>
+                    <Path
+                      d={d}
+                      key={i}
+                      strokeWidth={strokeWidth}
+                      stroke={bgCircleColor}
+                      fill="none"
+                    />
+                    {i === 0 && (
+                      <Line
+                        x1={`${fromX + strokeWidth / 2}`}
+                        y1={`${fromY - 5}`}
+                        x2={`${fromX + strokeWidth / 2}`}
+                        y2={`${fromY + 5}`}
+                        stroke="white"
+                        strokeWidth="1"
+                      />
+                    )}
+                    {i === segments - 1 && (
+                      <Line
+                        x1={`${toX - strokeWidth / 2}`}
+                        y1={`${toY - 5}`}
+                        x2={`${toX - strokeWidth / 2}`}
+                        y2={`${toY + 5}`}
+                        stroke="white"
+                        strokeWidth="1"
+                      />
+                    )}
+                  </G>
                 );
               })
             ) : (
@@ -352,22 +332,18 @@ export default class CircularSlider extends PureComponent {
                 stroke={bgCircleColor}
               />
             )}
-            {showClockFace && (
-              <ClockFace r={radius - strokeWidth / 2} stroke={clockFaceColor} />
-            )}
+            {showClockFace && <ClockFace r={radius - strokeWidth / 2} stroke={clockFaceColor} />}
             {range(segments).map(i => {
               const { fromX, fromY, toX, toY } = calculateArcCircle(
                 i,
                 segments,
                 radius,
                 startAngle,
-                angleLength,
+                angleLength
               );
               const d = `M ${fromX.toFixed(2)} ${fromY.toFixed(
-                2,
-              )} A ${radius} ${radius} 0 0 1 ${toX.toFixed(2)} ${toY.toFixed(
-                2,
-              )}`;
+                2
+              )} A ${radius} ${radius} 0 0 1 ${toX.toFixed(2)} ${toY.toFixed(2)}`;
 
               return (
                 <Path
@@ -389,9 +365,7 @@ export default class CircularSlider extends PureComponent {
               y={`${stop.toY}`}
               fill={gradientColorTo}
               transform={{ translate: `${stop.toX}, ${stop.toY}` }}
-              onPressIn={() =>
-                this.setState({ angleLength: angleLength + Math.PI / 2 })
-              }
+              onPressIn={() => this.setState({ angleLength: angleLength + Math.PI / 2 })}
               {...this._wakePanResponder.panHandlers}
             >
               <Circle
