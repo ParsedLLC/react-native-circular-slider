@@ -266,6 +266,7 @@ export default class CircularSlider extends PureComponent {
       startIcon,
       stopIcon,
       circlePercentInDecimal,
+      rangeMarkColor
     } = this.props;
 
     const containerWidth = this.getContainerWidth();
@@ -367,7 +368,7 @@ export default class CircularSlider extends PureComponent {
                         y1={`${fromY - 5}`}
                         x2={`${fromX + strokeWidth / 2}`}
                         y2={`${fromY + 5}`}
-                        stroke="white"
+                        stroke={rangeMarkColor || "white"}
                         strokeWidth="1"
                       />
                     )}
@@ -377,7 +378,7 @@ export default class CircularSlider extends PureComponent {
                         y1={`${toY - 5}`}
                         x2={`${toX - strokeWidth / 2}`}
                         y2={`${toY + 5}`}
-                        stroke="white"
+                        stroke={rangeMarkColor || "white"}
                         strokeWidth="1"
                       />
                     )}
