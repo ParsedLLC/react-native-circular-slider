@@ -354,10 +354,9 @@ export default class CircularSlider extends PureComponent {
                   2,
                 )}`;
                 return (
-                  <G>
+                  <G key={i}>
                     <Path
                       d={d}
-                      key={i}
                       strokeWidth={strokeWidth}
                       stroke={bgCircleColor}
                       fill="none"
